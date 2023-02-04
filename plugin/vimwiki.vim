@@ -10,8 +10,8 @@ if exists('g:loaded_vimwiki') || &compatible
 endif
 let g:loaded_vimwiki = 1
 
-" Set to version number for release, otherwise -1 for dev-branch
-let s:plugin_vers = str2float('-1')
+" Set to version number for release:
+let g:vimwiki_version = '2022.12.02'
 
 " Get the directory the script is installed in
 let s:plugin_dir = expand('<sfile>:p:h:h')
@@ -209,21 +209,18 @@ endfunction
 " Echo vimwiki version
 " Called by :VimwikiShowVersion
 function! s:get_version() abort
-  if s:plugin_vers != -1
-    echo 'Stable version: ' . string(s:plugin_vers)
+  echo 'Version: ' . g:vimwiki_version
+  let l:plugin_rev    = system('git --git-dir ' . s:plugin_dir . '/.git rev-parse --short HEAD')
+  let l:plugin_branch = system('git --git-dir ' . s:plugin_dir . '/.git rev-parse --abbrev-ref HEAD')
+  let l:plugin_date   = system('git --git-dir ' . s:plugin_dir . '/.git show -s --format=%ci')
+  if v:shell_error == 0
+    echo 'Os: ' . vimwiki#u#os_name()
+    echo 'Vim: ' . v:version
+    echo 'Branch: ' . l:plugin_branch
+    echo 'Revision: ' . l:plugin_rev
+    echo 'Date: ' . l:plugin_date
   else
-    let l:plugin_rev    = system('git --git-dir ' . s:plugin_dir . '/.git rev-parse --short HEAD')
-    let l:plugin_branch = system('git --git-dir ' . s:plugin_dir . '/.git rev-parse --abbrev-ref HEAD')
-    let l:plugin_date   = system('git --git-dir ' . s:plugin_dir . '/.git show -s --format=%ci')
-    if v:shell_error == 0
-      echo 'Os: ' . vimwiki#u#os_name()
-      echo 'Vim: ' . v:version
-      echo 'Branch: ' . l:plugin_branch
-      echo 'Revision: ' . l:plugin_rev
-      echo 'Date: ' . l:plugin_date
-    else
-      echo 'Unknown version'
-    endif
+    echo 'Unable to retrieve repository info'
   endif
 endfunction
 
@@ -362,7 +359,7 @@ command! -count=0 VimwikiDiaryIndex
       \ call vimwiki#diary#goto_diary_index(<count>)
 
 command! -count=0 VimwikiMakeDiaryNote
-      \ call vimwiki#diary#make_note(<count>)
+      \ call vimwiki#diary#make_note(<count>, 5)
 
 command! -count=0 VimwikiTabMakeDiaryNote
       \ call vimwiki#diary#make_note(<count>, 1)
@@ -397,7 +394,7 @@ nnoremap <silent><script> <Plug>VimwikiDiaryIndex
 nnoremap <silent><script> <Plug>VimwikiDiaryGenerateLinks
     \ :VimwikiDiaryGenerateLinks<CR>
 nnoremap <silent><script> <Plug>VimwikiMakeDiaryNote
-    \ :<C-U>call vimwiki#diary#make_note(v:count)<CR>
+    \ :<C-U>call vimwiki#diary#make_note(v:count, 5)<CR>
 nnoremap <silent><script> <Plug>VimwikiTabMakeDiaryNote
     \ :<C-U>call vimwiki#diary#make_note(v:count, 1)<CR>
 nnoremap <silent><script> <Plug>VimwikiMakeYesterdayDiaryNote
